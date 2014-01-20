@@ -13,4 +13,4 @@ Testing
     rsp.context['template_var']
 
     assert self.client.login(**login_parms)
-  . login(email='foo@example.com', password='cleartextpassword')
+    login(email='foo@example.com', password='cleartextpassword')
