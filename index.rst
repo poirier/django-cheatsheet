@@ -12,9 +12,13 @@ Contents:
    :maxdepth: 2
 
    admin
+   data
+   ddt
    email
+   forms
    permissions
    queries
+   settings
    test
    translation
    urls
