@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    admin
+   celery
    data
    ddt
    email

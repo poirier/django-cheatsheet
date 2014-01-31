@@ -17,3 +17,7 @@ Console email handler
 For development::
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+For real::
+
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
