@@ -24,6 +24,13 @@ Contents:
    urls
 
 
+Misc to file:
+
+Avoid circular imports::
+
+    from django.db.models import get_model
+    MyModel = get_model('applabel', 'mymodelname'.lower())
+
 Indices and tables
 ==================
 
