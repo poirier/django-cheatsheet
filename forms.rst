@@ -75,11 +75,12 @@ Render form in template
             {% endif %}
             {% for field in form %}
               <tr{% if field.field.required %} class="required"{% endif %}>
-                <th style="text-align: left"><label for="{{ field.id }}">{{ field.label }}:</label></th>
+                <th style="text-align: left"><label for="{{ field.id_for_label }}">{{ field.label }}:</label></th>
                 <td>{% if field.errors %}
                       {{ field.errors }}<br/>
                     {% endif %}
                     {{ field }}
+                    or even <input id="{{ field.id_for_label }}" name="{{ field.html_name }}" value="{{ field.value }}"
                     {% if field.help_text %}
                       <br/><span class="helptext">{{ field.help_text }}</span>
                     {% endif %}
