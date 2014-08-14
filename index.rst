@@ -17,6 +17,7 @@ Contents:
    ddt
    email
    forms
+   mysql
    permissions
    queries
    settings
