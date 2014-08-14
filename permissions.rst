@@ -56,7 +56,7 @@ To create a new permission programmatically::
 Default permissions
 -------------------
 
-https://docs.djangoproject.com/en/1.6/topics/auth/default/#default-permissions
+https://docs.djangoproject.com/en/dev/topics/auth/default/#default-permissions
 
 For every model in an installed app, Django automatically creates three
 permissions: `applabel.add_modelname`, `applabel.change_modelname`, and
@@ -65,9 +65,11 @@ permissions: `applabel.add_modelname`, `applabel.change_modelname`, and
 Adding model permissions
 ------------------------
 
-https://docs.djangoproject.com/en/1.6/ref/models/options/#permissions
+https://docs.djangoproject.com/en/dev/ref/models/options/#permissions
 
-You can ask Django to create more permissions for a model::
+You can ask Django to create more permissions for a model:
+
+.. code-block:: python
 
     class Meta:
         permissions = [
@@ -85,7 +87,9 @@ Permission objects too.
     create it again).
 
 You can programmatically force Django to create additional Permissions
-with code like::
+with code like:
+
+.. code-block:: python
 
     from django.db.models import get_models, get_app
     from django.contrib.auth.management import create_permissions

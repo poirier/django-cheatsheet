@@ -1,7 +1,9 @@
 Settings
 ========
 
-Generate a secret key::
+Generate a secret key:
+
+.. code-block:: python
 
     from django.utils.crypto import get_random_string
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -13,6 +15,7 @@ Generate a secret key::
 
 Log errors to console in local.py:
 
+.. code-block:: python
 
     LOGGING.setdefault('formatters', {})
     LOGGING['formatters']['verbose'] = {

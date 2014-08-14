@@ -2,6 +2,8 @@
 Testing
 =======
 
+.. code-block:: python
+
     self.assertEqual(a, b, msg=None)
 
 
@@ -18,7 +20,9 @@ Testing
 
 
 # http://docs.python.org/library/unittest.html
-# https://docs.djangoproject.com/en/1.3/topics/testing/
+# https://docs.djangoproject.com/en/dev/topics/testing/
+
+.. code-block:: python
 
 from django.test import TestCase
 from django.contrib.auth.models import User

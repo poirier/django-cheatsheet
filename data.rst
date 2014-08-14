@@ -13,7 +13,9 @@ Load it again::
 Natural keys
 ------------
 
-https://docs.djangoproject.com/en/1.4/topics/serialization/#natural-keys
+https://docs.djangoproject.com/en/dev/topics/serialization/#natural-keys
+
+.. code-block:: python
 
     from django.db import models
 
@@ -35,7 +37,9 @@ Dependencies
 ~~~~~~~~~~~~
 
 If part of the natural key is a reference to another model, then
-that model needs to be deserialized first.
+that model needs to be deserialized first:
+
+.. code-block:: python
 
     class Book(models.Model):
         name = models.CharField(max_length=100)

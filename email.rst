@@ -1,7 +1,7 @@
 Email
 =====
 
-https://docs.djangoproject.com/en/1.6/topics/email/
+https://docs.djangoproject.com/en/dev/topics/email/
 
 API
 ---
@@ -14,7 +14,7 @@ Send one email::
 Email backends/handlers
 -----------------------
 
-https://docs.djangoproject.com/en/1.6/topics/email/#email-backends
+https://docs.djangoproject.com/en/dev/topics/email/#email-backends
 
 For development::
 

@@ -5,7 +5,7 @@ URLs
 reverse
 =======
 
-Ex::
+.. code-block:: python
 
     from django.core.urlresolvers import reverse
 
@@ -18,11 +18,9 @@ Ex::
 redirect
 ========
 
-redirect
-from django.shortcuts import redirect
+.. code-block:: python
 
-``redirect``
-============
+    from django.shortcuts import redirect
 
 .. function:: redirect(to[, permanent=False], *args, **kwargs)
 
@@ -77,7 +75,9 @@ You can use the :func:`redirect` function in a number of ways.
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
-will be returned::
+will be returned:
+
+.. code-block:: python
 
     def my_view(request):
         ...
@@ -85,18 +85,21 @@ will be returned::
         return redirect(object, permanent=True)
 
 
-https://docs.djangoproject.com/en/1.3/topics/http/urls/
-from django.conf.urls.defaults import patterns, include, url
-from django.contrib import admin admin.autodiscover()
+https://docs.djangoproject.com/en/dev/topics/http/urls/
 
-urlpatterns = patterns('',
-    (r'^polls/', include('polls.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-)
-urlpatterns = patterns('polls.views',
-    (r'^, 'index'),
-    (r'^(?P<poll_id>\d+)/, 'detail'),
-    (r'^(?P<poll_id>\d+)/results/, 'results'),
-    (r'^(?P<poll_id>\d+)/vote/, 'vote'),
-    url(r'^(?P<poll_id>\d+)/foo/, 'fooview', name='app-viewname'),
-)
+.. code-block:: python
+
+    from django.conf.urls.defaults import patterns, include, url
+    from django.contrib import admin admin.autodiscover()
+
+    urlpatterns = patterns('',
+        (r'^polls/', include('polls.urls')),
+        url(r'^admin/', include(admin.site.urls)),
+    )
+    urlpatterns = patterns('polls.views',
+        (r'^, 'index'),
+        (r'^(?P<poll_id>\d+)/, 'detail'),
+        (r'^(?P<poll_id>\d+)/results/, 'results'),
+        (r'^(?P<poll_id>\d+)/vote/, 'vote'),
+        url(r'^(?P<poll_id>\d+)/foo/, 'fooview', name='app-viewname'),
+    )
