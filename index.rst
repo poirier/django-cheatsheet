@@ -20,6 +20,7 @@ Contents:
    ddt
    email
    forms
+   logging
    mysql
    permissions
    queries
