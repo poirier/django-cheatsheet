@@ -116,3 +116,61 @@ Render form in template::
                 </ul>
             </fieldset>
         </form>
+
+
+Read-only form
+==============
+
+Call this on the form::
+
+    def make_form_readonly(form):
+        """
+        Set some attributes on a form's fields that, IN COMBINATION WITH TEMPLATE CHANGES,
+        allow us to display it as read-only.
+        """
+
+        # Note that a new BoundField is constructed on the fly when you access
+        # form[name], so any data we want to persist long enough for the template
+        # to access needs to be on the "real" field.  We just use the BoundField
+        # to get at the field value.
+
+        for name in form.fields:
+            field = form.fields[name]
+            bound_field = form[name]
+            if hasattr(field.widget, 'choices'):
+                try:
+                    display_value = dict(field.widget.choices)[bound_field.value()]
+                except KeyError:
+                    display_value = ''
+            else:
+                display_value = bound_field.value()
+
+            field.readonly = True
+            field.display_value = display_value
+
+Do things like this in the templates::
+
+    {# Date field #}
+    {% if field.field.readonly %}
+        <span class="form-control">{{ field.value|date:'c' }}</span>
+    {% else %}
+        <input type="date" class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" value="{{ field.value|date:'c' }}">
+    {% endif %}
+
+    {# input fields #}
+    {% if field.field.readonly %}
+        <span class="form-control">{{ field.value }}</span>
+    {% else %}
+        <input type="{% block input_field_type %}text{% endblock %}" class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" value="{{ field.value }}" {% if field.field.widget.attrs.placeholder %}placeholder="{{ field.field.widget.attrs.placeholder }}"{% endif %} {% block input_attrs %}{% endblock %}>
+    {% endif %}
+
+    {# select fields #}
+    {% if field.field.readonly %}
+        <span class="form-control">{{ field.field.display_value }}</span>
+    {% else %}
+        <select class="form-control" id="{{ field.id_for_label }}"  name="{{ field.html_name }}" placeholder="">
+          {% for val, label in field.field.widget.choices %}
+            <option value="{{ val }}"{% if field.value|stringformat:'s' == val|stringformat:'s' %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+    {% endif %}

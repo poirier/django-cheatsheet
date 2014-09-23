@@ -213,6 +213,8 @@ Settings::
         'version': 1,
         'disable_existing_loggers': True,
         'filters': {
+            # This filter strips out request information from the message record
+            # so it can be sent to Graylog (the request object is not picklable).
             'django_exc': {
                 '()': 'our_filters.RequestFilter',
             },
@@ -262,10 +264,25 @@ Settings::
             },
         },
         'root': {
-            'handlers': ['file', 'graylog', 'mail_admins', 'sentry'],
+            # graylog (or any handler using the 'django_exc' filter ) should be last
+            # because it will alter the LogRecord by removing the `request` field
+            'handlers': ['file', 'mail_admins', 'sentry', 'graylog'],
             'level': 'WARNING',
         },
         'loggers': {
+            # These 2 loggers must be specified, otherwise they get disabled
+            # because they are specified by django's DEFAULT_LOGGING and then
+            # disabled by our 'disable_existing_loggers' setting above.
+            # BEGIN required loggers #
+            'django': {
+                'handlers': [],
+                'propagate': True,
+            },
+            'py.warnings': {
+                'handlers': [],
+                'propagate': True,
+            },
+            # END required loggers #
             # The root logger will log anything WARNING and higher, so there's
             # no reason to add loggers here except to add logging of lower-level information.
             'libya_elections': {
