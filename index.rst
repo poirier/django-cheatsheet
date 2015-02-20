@@ -21,6 +21,7 @@ Contents:
    email
    forms
    logging
+   migrations
    mysql
    permissions
    queries
