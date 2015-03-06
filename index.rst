@@ -23,8 +23,10 @@ Contents:
    logging
    migrations
    mysql
+   nginx
    permissions
    queries
+   security
    settings
    test
    translation
