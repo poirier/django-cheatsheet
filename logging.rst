@@ -16,6 +16,7 @@ INFO level logging for celery is very verbose
 
 If you have DEBUG on, Django logs all SQL queries
 
+
 Default
 -------
 
@@ -69,6 +70,29 @@ Here's what Django uses (around 1.7, anyway) if you don't configure logging::
             },
         }
     }
+
+Console
+-------
+
+Log errors to console in local.py:
+
+.. code-block:: python
+
+    LOGGING.setdefault('formatters', {})
+    LOGGING['formatters']['verbose'] = {
+        'format': '[%(name)s] Message "%(message)s" from %(pathname)s:%(lineno)d in %(funcName)s'
+    }
+    LOGGING['handlers']['console'] = {
+        'class': 'logging.StreamHandler',
+        'formatter': 'verbose',
+        'level': 'ERROR',
+    }
+    LOGGING['loggers']['django'] = {
+                'handlers': ['console'],
+                'level': 'ERROR',
+                'propagate': True,
+    }
+
 
 Development
 -----------
