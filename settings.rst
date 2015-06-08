@@ -1,6 +1,17 @@
 Settings
 ========
 
+Using the right one
+-------------------
+
+Baumgartner suggests symlinking the desired one (e.g. `dev.py` or `deploy.py`)
+to `local.py` and hard-coding that in `manage.py`.
+
+Greenfelds suggest... (FILL THIS IN)
+
+Secret key
+----------
+
 Generate a secret key:
 
 .. code-block:: python
@@ -11,23 +22,32 @@ Generate a secret key:
 
 (https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26)
 
+Env vars
+--------
 
+Suppose you have env vars in a .env file::
 
-Log errors to console in local.py:
+    SECRET_KEY=jdfsdfsdf
+    PASSWORD=jsdkfjsdlkfjdsf
 
-.. code-block:: python
+You can load them into Django using `dotenv <https://github.com/jacobian/django-dotenv>`_.
+Pop open `manage.py`. Add::
 
-    LOGGING.setdefault('formatters', {})
-    LOGGING['formatters']['verbose'] = {
-        'format': '[%(name)s] Message "%(message)s" from %(pathname)s:%(lineno)d in %(funcName)s'
-    }
-    LOGGING['handlers']['console'] = {
-        'class': 'logging.StreamHandler',
-        'formatter': 'verbose',
-        'level': 'ERROR',
-    }
-    LOGGING['loggers']['django'] = {
-                'handlers': ['console'],
-                'level': 'ERROR',
-                'propagate': True,
-    }
+    import dotenv
+    dotenv.read_dotenv()
+
+Or in a settings file::
+
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+
+And if they're not all strings, use ast::
+
+    import ast, os
+
+    DEBUG = ast.literal_eval(os.environ.get("DEBUG", "True"))
+    TEMPLATE_DIRS = ast.literal_eval(os.environ.get("TEMPLATE_DIRS", "/path1,/path2"))
+
+You can load them into a shell this way::
+
+    export $(cat .env | grep -v ^# | xargs)
+

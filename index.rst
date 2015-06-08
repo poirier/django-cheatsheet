@@ -17,6 +17,7 @@ Contents:
    admin
    celery
    data
+   database
    ddt
    email
    fabric

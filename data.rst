@@ -1,6 +1,6 @@
-====
-Data
-====
+=============
+Data fixtures
+=============
 
 Export/dump data to use as a fixture::
 
