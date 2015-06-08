@@ -19,6 +19,7 @@ Contents:
    data
    ddt
    email
+   fabric
    forms
    logging
    migrations
