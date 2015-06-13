@@ -120,18 +120,43 @@ In settings::
                 'filename': os.path.join(LOG_DIR, 'django_debug.log',
             }
         },
+        'root': {  # For dev, show errors + some info in the console
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         'loggers': {
             'django.request': {  # debug logging of things that break requests
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
             },
-            'root': {  # For dev, show errors + some info in the console
-                'handlers': ['console'],
-                'level': 'INFO',
-            },
         },
     }
+
+Or how about:
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '%(name)-20s %(levelname)-8s %(message)s',
+            },
+        },
+        'handlers': {
+            'console': {  # Log to stdout
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'root': {  # For dev, show errors + some info in the console
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    }
+
+
 
 Staging
 -------
@@ -171,12 +196,12 @@ Like so::
                 'class': 'django.utils.log.AdminEmailHandler'
             },
         },
+        # EMAIL all errors (might not want this, but let's try it)
+        'root': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+        },
         'loggers': {
-            # EMAIL all errors (might not want this, but let's try it)
-            'root': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-            },
             'django.request': {
                 'handlers': ['file'],
                 'level': 'INFO',
