@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Permissions &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Queries" href="queries.html" />
+    <link rel="prev" title="NGINX" href="nginx.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="queries.html" title="Queries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nginx.html" title="NGINX"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="permissions">
+<h1>Permissions<a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h1>
+<p>(Note: this page is about authorization, not authentication.)</p>
+<p>Link: <a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/auth/default/#topic-authorization">https://docs.djangoproject.com/en/1.6/topics/auth/default/#topic-authorization</a></p>
+<p>User objects have two many-to-many fields: groups and user_permissions. User objects can access their related objects in the same way as any other Django model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">myuser</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_list</span><span class="p">]</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">user_permissions</span> <span class="o">=</span> <span class="p">[</span><span class="n">permission_list</span><span class="p">]</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">user_permissions</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">user_permissions</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">myuser</span><span class="o">.</span><span class="n">user_permissions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Assuming you have an application with an app_label foo and a model named Bar, to test for basic permissions you should use:</p>
+<ul class="simple">
+<li>add: user.has_perm(&#8216;foo.add_bar&#8217;)</li>
+<li>change: user.has_perm(&#8216;foo.change_bar&#8217;)</li>
+<li>delete: user.has_perm(&#8216;foo.delete_bar&#8217;)</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is no default permission for read access.</p>
+</div>
+<p>The Permission model is rarely accessed directly, but here it is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">permission</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="s">&#39;can_publish&#39;</span><span class="p">,</span>
+                                       <span class="n">name</span><span class="o">=</span><span class="s">&#39;Can Publish Posts&#39;</span><span class="p">,</span>  <span class="c"># verbose human-readable name</span>
+                                       <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Permissions are more commonly referred to by a string, of the form &#8220;app_label.codename&#8221;.
+E.g., <tt class="docutils literal"><span class="pre">if</span> <span class="pre">user.has_perm('myapp.codename'):</span>&nbsp; <span class="pre">do</span> <span class="pre">something</span></tt>.</p>
+<p>Confusingly, the <tt class="docutils literal"><span class="pre">Permission</span></tt> model has no <tt class="docutils literal"><span class="pre">app_label</span></tt> field.
+It uses <tt class="docutils literal"><span class="pre">content_type__app_label</span></tt> for that.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This means all permissions
+need a content type, whether it makes sense for that permission to
+be applied to a particular model or not.</p>
+</div>
+<p>To create a new permission programmatically:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">BlogPost</span><span class="p">)</span>
+<span class="n">permission</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="s">&#39;can_publish&#39;</span><span class="p">,</span>
+                                       <span class="n">name</span><span class="o">=</span><span class="s">&#39;Can Publish Posts&#39;</span><span class="p">,</span>
+                                       <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="default-permissions">
+<h2>Default permissions<a class="headerlink" href="#default-permissions" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/default/#default-permissions">https://docs.djangoproject.com/en/dev/topics/auth/default/#default-permissions</a></p>
+<p>For every model in an installed app, Django automatically creates three
+permissions: <cite>applabel.add_modelname</cite>, <cite>applabel.change_modelname</cite>, and
+<cite>applabel.delete_modelname</cite>, where the modelname is lowercased.</p>
+</div>
+<div class="section" id="adding-model-permissions">
+<h2>Adding model permissions<a class="headerlink" href="#adding-model-permissions" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/models/options/#permissions">https://docs.djangoproject.com/en/dev/ref/models/options/#permissions</a></p>
+<p>You can ask Django to create more permissions for a model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+    <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s">&#39;codename&#39;</span><span class="p">,</span> <span class="s">&#39;verbose name&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>When the table is created during <tt class="docutils literal"><span class="pre">syncdb</span></tt>, Django will create the additional
+Permission objects too.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Prior to Django 1.7,
+such permissions were <em>only</em> created when Django creates the model&#8217;s
+table during <tt class="docutils literal"><span class="pre">syncdb</span></tt>. Adding permissions to the model definition
+later does nothing (unless you drop the table and force Django to
+create it again).</p>
+</div>
+<p>You can programmatically force Django to create additional Permissions
+with code like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">get_models</span><span class="p">,</span> <span class="n">get_app</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.management</span> <span class="kn">import</span> <span class="n">create_permissions</span>
+
+<span class="n">apps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">get_app</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">app_label</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">get_models</span><span class="p">()])</span>
+<span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">:</span>
+    <span class="n">create_permissions</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="best-practices">
+<h2>Best practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Plan not to give users specific permissions, except when you have to make
+an exception to your usual policies.</li>
+<li>Design groups with useful sets of permissions.</li>
+<li>Plan to add users to the appropriate groups depending on their roles.</li>
+<li>Provide a way to ensure the groups continue to have the permissions you want.</li>
+</ul>
+<p>Fixtures aren&#8217;t a bad way to provide initial data, but setting them
+up for automatic loading is deprecated with Django 1.7 and will go
+away with Django 2.0. Instead, load them from a data migration. This
+is better in some ways anyway, because the migration will use the same
+version of the models that the fixtures were written for at the time.
+(Though, this doesn&#8217;t matter so much for Permissions and Groups, which
+we don&#8217;t really expect to change their schemas...)</p>
+<p>Add utility methods like this, maybe in <cite>accounts/utils.py</cite> or equivalent:</p>
+<div class="highlight-python"><div class="highlight"><pre>def permission_names_to_objects(names):
+    &quot;&quot;&quot;
+    Given an iterable of permission names (e.g. &#39;app_label.add_model&#39;),
+    return an iterable of Permission objects for them.  The permission
+    must already exist, because a permission name is not enough information
+    to create a new permission.
+    &quot;&quot;&quot;
+    result = []
+    for name in names:
+        app_label, codename = name.split(&quot;.&quot;, 1)
+        # Is that enough to be unique? Hope so
+        try:
+            result.append(Permission.objects.get(content_type__app_label=app_label,
+                                                 codename=codename))
+        except Permission.DoesNotExist:
+            logger.exception(&quot;NO SUCH PERMISSION: %s, %s&quot; % (app_label, codename))
+            raise
+    return result
+
+
+def get_all_perm_names_for_group(group):
+    # Return the set of permission names that the group should contain
+
+
+def create__or_update_groups():
+    for group_name, perm_names in GROUP_PERMISSIONS.iteritems():
+        group, created = Group.objects.get_or_create(name=group_name)
+        perms_to_add = permission_names_to_objects(get_all_perm_names_for_group(group))
+        group.permissions.add(*perms_to_add)
+        if not created:
+            # Group already existed - make sure it doesn&#39;t have any perms we didn&#39;t want
+            to_remove = set(group.permissions.all()) - set(perms_to_add)
+            if to_remove:
+                group.permissions.remove(*to_remove)
+</pre></div>
+</div>
+</div>
+<div class="section" id="checking-permissions-in-templates">
+<h2>Checking permissions in templates<a class="headerlink" href="#checking-permissions-in-templates" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/default/#authentication-data-in-templates">https://docs.djangoproject.com/en/dev/topics/auth/default/#authentication-data-in-templates</a></p>
+<blockquote>
+<div>{% if user.is_authenticated %}
+{% if perms.applabel %} {# user has any permissions in app <cite>applabel</cite> #}
+{% if &#8216;applabel&#8217; in perms %} {# same as above %}
+{% if perms.applabel.change_thing %} {# user has &#8216;change_thing&#8217; permission in app <cite>applabel</cite> #}
+{% if &#8216;applabel.change_thing&#8217; in perms %} {# same as above #}</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Permissions</a><ul>
+<li><a class="reference internal" href="#default-permissions">Default permissions</a></li>
+<li><a class="reference internal" href="#adding-model-permissions">Adding model permissions</a></li>
+<li><a class="reference internal" href="#best-practices">Best practices</a></li>
+<li><a class="reference internal" href="#checking-permissions-in-templates">Checking permissions in templates</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nginx.html"
+                        title="previous chapter">NGINX</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="queries.html"
+                        title="next chapter">Queries</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/permissions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="queries.html" title="Queries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nginx.html" title="NGINX"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

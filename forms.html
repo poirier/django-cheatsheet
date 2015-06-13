@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Forms &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Logging" href="logging.html" />
+    <link rel="prev" title="Fabric" href="fabric.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="logging.html" title="Logging"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fabric.html" title="Fabric"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="forms">
+<h1>Forms<a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/forms/">https://docs.djangoproject.com/en/dev/topics/forms/</a></li>
+<li><a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/forms/api/">https://docs.djangoproject.com/en/dev/ref/forms/api/</a></li>
+</ul>
+<p>A basic form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Processing a form in a view function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">contact</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span> <span class="c"># If the form has been submitted...</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ContactForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span> <span class="c"># A form bound to the POST data</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span> <span class="c"># All validation rules pass</span>
+            <span class="c"># Process the data in form.cleaned_data</span>
+            <span class="c"># ...</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s">&#39;/thanks/&#39;</span><span class="p">)</span> <span class="c"># Redirect after POST</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ContactForm</span><span class="p">()</span> <span class="c"># An unbound form</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;contact.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+    <span class="p">})</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/forms/modelforms/">https://docs.djangoproject.com/en/dev/topics/forms/modelforms/</a></p>
+<p>A model form:</p>
+<div class="highlight-python"><div class="highlight"><pre>from django.forms import ModelForm, ValidationError
+
+# Create the form class.
+class ArticleForm(ModelForm):
+    class Meta:
+        model = Article
+        fields = (&#39;name&#39;, &#39;title&#39;)
+        # or
+        exclude = (&#39;birth_date&#39;)
+
+    def clean_fieldname(self):
+        if &#39;fieldname&#39; in self.cleaned_data:
+            data = self.cleaned_data[&#39;fieldname&#39;]
+            if not /valid/:
+                raise ValidationError(&quot;msg&quot;)
+            return data
+
+    def clean(self):
+        data = self.cleaned_data
+        if not /valid/:
+            raise ValidationError(&quot;msg&quot;)
+        return data
+
+# Creating a form to add an article.
+form = ArticleForm()
+...
+new_article = form.save()
+
+# Creating a form to change an existing article.
+article = Article.objects.get(pk=1)
+form = ArticleForm(instance=article)
+...
+form.save()
+
+# Create a form to edit an existing Article, but use POST data to populate the form.
+a = Article.objects.get(pk=1)
+f = ArticleForm(request.POST, instance=a)
+f.save()
+</pre></div>
+</div>
+<p>Render form in template:</p>
+<div class="highlight-python"><div class="highlight"><pre>&lt;!-- Using table - avoid that part - but this does show how to render the fields individually --&gt;
+      &lt;form {% if form.is_multipart %}enctype=&quot;multipart/form-data&quot;{% endif %} action=&quot;&quot; method=&quot;post&quot; class=&quot;uniForm&quot;&gt;{% csrf_token %}
+        &lt;table&gt;
+          &lt;fieldset&gt;
+            {% if form.non_field_errors %}
+              &lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;{{ form.non_field_errors }}&lt;/td&gt;&lt;/tr&gt;
+            {% endif %}
+            {% for field in form %}
+              &lt;tr{% if field.field.required %} class=&quot;required&quot;{% endif %}&gt;
+                &lt;th style=&quot;text-align: left&quot;&gt;&lt;label for=&quot;{{ field.id_for_label }}&quot;&gt;{{ field.label }}:&lt;/label&gt;&lt;/th&gt;
+                &lt;td&gt;{% if field.errors %}
+                      {{ field.errors }}&lt;br/&gt;
+                    {% endif %}
+                    {{ field }}
+                    or even &lt;input id=&quot;{{ field.id_for_label }}&quot; name=&quot;{{ field.html_name }}&quot; value=&quot;{{ field.value }}&quot;
+                    {% if field.help_text %}
+                      &lt;br/&gt;&lt;span class=&quot;helptext&quot;&gt;{{ field.help_text }}&lt;/span&gt;
+                    {% endif %}
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            {% endfor %}
+          &lt;/fieldset&gt;
+        &lt;/table&gt;
+        &lt;div class=&quot;ctrlHolder buttonHolder&quot;&gt;
+          &lt;button type=&quot;submit&quot; class=&quot;primaryAction&quot; name=&quot;submit_changes&quot;&gt;Submit changes&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+
+&lt;!-- Using a list, which is preferred --&gt;
+
+    &lt;form {% if form.is_multipart %}enctype=&quot;multipart/form-data&quot;{% endif %} action=&quot;&quot; method=&quot;post&quot; class=&quot;uniForm&quot;&gt;{% csrf_token %}
+        &lt;fieldset&gt;
+            &lt;ul&gt;
+                {{ form.as_ul }}
+                &lt;li&gt;
+                    &lt;div class=&quot;ctrlHolder buttonHolder&quot;&gt;
+                        &lt;button type=&quot;submit&quot; class=&quot;primaryAction&quot; name=&quot;submit_changes&quot;&gt;Submit changes&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="read-only-form">
+<h1>Read-only form<a class="headerlink" href="#read-only-form" title="Permalink to this headline">¶</a></h1>
+<p>Call this on the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">make_form_readonly</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set some attributes on a form&#39;s fields that, IN COMBINATION WITH TEMPLATE CHANGES,</span>
+<span class="sd">    allow us to display it as read-only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Note that a new BoundField is constructed on the fly when you access</span>
+    <span class="c"># form[name], so any data we want to persist long enough for the template</span>
+    <span class="c"># to access needs to be on the &quot;real&quot; field.  We just use the BoundField</span>
+    <span class="c"># to get at the field value.</span>
+
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">bound_field</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="p">,</span> <span class="s">&#39;choices&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">display_value</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">choices</span><span class="p">)[</span><span class="n">bound_field</span><span class="o">.</span><span class="n">value</span><span class="p">()]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">display_value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">display_value</span> <span class="o">=</span> <span class="n">bound_field</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+
+        <span class="n">field</span><span class="o">.</span><span class="n">readonly</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">field</span><span class="o">.</span><span class="n">display_value</span> <span class="o">=</span> <span class="n">display_value</span>
+</pre></div>
+</div>
+<p>Do things like this in the templates:</p>
+<div class="highlight-python"><div class="highlight"><pre>{# Date field #}
+{% if field.field.readonly %}
+    &lt;span class=&quot;form-control&quot;&gt;{{ field.value|date:&#39;c&#39; }}&lt;/span&gt;
+{% else %}
+    &lt;input type=&quot;date&quot; class=&quot;form-control&quot; id=&quot;{{ field.id_for_label }}&quot; name=&quot;{{ field.html_name }}&quot; value=&quot;{{ field.value|date:&#39;c&#39; }}&quot;&gt;
+{% endif %}
+
+{# input fields #}
+{% if field.field.readonly %}
+    &lt;span class=&quot;form-control&quot;&gt;{{ field.value }}&lt;/span&gt;
+{% else %}
+    &lt;input type=&quot;{% block input_field_type %}text{% endblock %}&quot; class=&quot;form-control&quot; id=&quot;{{ field.id_for_label }}&quot; name=&quot;{{ field.html_name }}&quot; value=&quot;{{ field.value }}&quot; {% if field.field.widget.attrs.placeholder %}placeholder=&quot;{{ field.field.widget.attrs.placeholder }}&quot;{% endif %} {% block input_attrs %}{% endblock %}&gt;
+{% endif %}
+
+{# select fields #}
+{% if field.field.readonly %}
+    &lt;span class=&quot;form-control&quot;&gt;{{ field.field.display_value }}&lt;/span&gt;
+{% else %}
+    &lt;select class=&quot;form-control&quot; id=&quot;{{ field.id_for_label }}&quot;  name=&quot;{{ field.html_name }}&quot; placeholder=&quot;&quot;&gt;
+      {% for val, label in field.field.widget.choices %}
+        &lt;option value=&quot;{{ val }}&quot;{% if field.value|stringformat:&#39;s&#39; == val|stringformat:&#39;s&#39; %} selected{% endif %}&gt;{{ label }}&lt;/option&gt;
+      {% endfor %}
+    &lt;/select&gt;
+{% endif %}
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Forms</a></li>
+<li><a class="reference internal" href="#read-only-form">Read-only form</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fabric.html"
+                        title="previous chapter">Fabric</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="logging.html"
+                        title="next chapter">Logging</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/forms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="logging.html" title="Logging"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fabric.html" title="Fabric"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

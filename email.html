@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Email &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Fabric" href="fabric.html" />
+    <link rel="prev" title="Django Debug Toolbar" href="ddt.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fabric.html" title="Fabric"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ddt.html" title="Django Debug Toolbar"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="email">
+<h1>Email<a class="headerlink" href="#email" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/email/">https://docs.djangoproject.com/en/dev/topics/email/</a></p>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<p>Send one email:</p>
+<div class="highlight-python"><div class="highlight"><pre>send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)¶
+</pre></div>
+</div>
+</div>
+<div class="section" id="email-backends-handlers">
+<h2>Email backends/handlers<a class="headerlink" href="#email-backends-handlers" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/email/#email-backends">https://docs.djangoproject.com/en/dev/topics/email/#email-backends</a></p>
+<p>For development:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s">&#39;django.core.mail.backends.console.EmailBackend&#39;</span>
+</pre></div>
+</div>
+<p>For real:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s">&#39;django.core.mail.backends.smtp.EmailBackend&#39;</span>
+</pre></div>
+</div>
+<p>In-memory backend - The &#8216;locmem&#8217; backend stores messages in a special attribute of the django.core.mail module. The outbox attribute is created when the first message is sent. It’s a list with an EmailMessage instance for each message that would be sent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s">&#39;django.core.mail.backends.locmem.EmailBackend&#39;</span>
+</pre></div>
+</div>
+<p>This backend is not intended for use in production – it is provided as a convenience that can be used during development and testing.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Email</a><ul>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#email-backends-handlers">Email backends/handlers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ddt.html"
+                        title="previous chapter">Django Debug Toolbar</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fabric.html"
+                        title="next chapter">Fabric</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/email.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fabric.html" title="Fabric"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ddt.html" title="Django Debug Toolbar"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

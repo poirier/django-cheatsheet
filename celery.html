@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Celery &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Data fixtures" href="data.html" />
+    <link rel="prev" title="Admin" href="admin.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="data.html" title="Data fixtures"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="admin.html" title="Admin"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="celery">
+<h1>Celery<a class="headerlink" href="#celery" title="Permalink to this headline">¶</a></h1>
+<p>(Yes, I know Celery isn&#8217;t Django-specific.)</p>
+<p><a class="reference external" href="http://docs.celeryproject.org/en/latest/">http://docs.celeryproject.org/en/latest/</a></p>
+<div class="section" id="useful-settings">
+<h2>Useful settings<a class="headerlink" href="#useful-settings" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://docs.celeryproject.org/en/latest/configuration.html">http://docs.celeryproject.org/en/latest/configuration.html</a></p>
+<p>CELERY_ALWAYS_EAGER: If this is True, all tasks will be executed locally by blocking until the task returns. apply_async() and Task.delay() will return an EagerResult instance, which emulates the API and behavior of AsyncResult, except the result is already evaluated.</p>
+<p>That is, tasks will be executed locally instead of being sent to the queue.</p>
+<p>CELERY_EAGER_PROPAGATES_EXCEPTIONS: If this is True, eagerly executed tasks (applied by task.apply(), or when the CELERY_ALWAYS_EAGER setting is enabled), will propagate exceptions.</p>
+<p>It’s the same as always running apply() with throw=True.</p>
+<p>CELERY_IGNORE_RESULT: Whether to store the task return values or not (tombstones). If you still want to store errors, just not successful return values, you can set CELERY_STORE_ERRORS_EVEN_IF_IGNORED.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Celery</a><ul>
+<li><a class="reference internal" href="#useful-settings">Useful settings</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="admin.html"
+                        title="previous chapter">Admin</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data.html"
+                        title="next chapter">Data fixtures</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/celery.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="data.html" title="Data fixtures"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="admin.html" title="Admin"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

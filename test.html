@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Translation" href="translation.html" />
+    <link rel="prev" title="Settings" href="settings.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="translation.html" title="Translation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+
+<span class="n">rsp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">[</span><span class="n">follow</span><span class="o">=</span><span class="bp">True</span><span class="p">])</span>
+<span class="n">rsp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="n">follow</span><span class="o">=</span><span class="bp">True</span><span class="p">])</span>
+
+<span class="n">rsp</span><span class="o">.</span><span class="n">content</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">byte</span> <span class="n">string</span>
+<span class="n">rsp</span><span class="p">[</span><span class="s">&#39;HeaderName&#39;</span><span class="p">]</span>
+<span class="n">rsp</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s">&#39;template_var&#39;</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="o">**</span><span class="n">login_parms</span><span class="p">)</span>
+<span class="n">login</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="s">&#39;foo@example.com&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;cleartextpassword&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p># <a class="reference external" href="http://docs.python.org/library/unittest.html">http://docs.python.org/library/unittest.html</a>
+# <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/testing/">https://docs.djangoproject.com/en/dev/topics/testing/</a></p>
+<div class="highlight-python"><div class="highlight"><pre>
+</pre></div>
+</div>
+<p>from django.test import TestCase
+from django.contrib.auth.models import User</p>
+<dl class="docutils">
+<dt>class XxxTest(TestCase):</dt>
+<dd><dl class="first last docutils">
+<dt>def setUp(self):</dt>
+<dd>self.user = User.objects.create_user(&#8216;tester&#8217;, <a class="reference external" href="mailto:'test&#37;&#52;&#48;example&#46;com">'test<span>&#64;</span>example<span>&#46;</span>com</a>&#8216;, &#8216;testpass&#8217;)</dd>
+<dt>def test_something(self):</dt>
+<dd>response = self.client.get(show_timemap)
+self.assertEqual(response.status_code, 200)
+self.assertEqual(response.context[&#8216;lat&#8217;], &#8216;123.123&#8217;)
+self.assertEqual(response.context[&#8216;lon&#8217;], &#8216;456.456&#8217;)
+self.assertContains(response, &#8220;some text&#8221;)
+self.assertNotContains(response, &#8220;other text&#8221;)
+self.assertIsNone(val)
+self.assertIsNotNone(val)
+self.assertIn(thing, iterable)  # Python &gt;= 2.7
+self.assertNotIn(thing, iterable)  # Python &gt;= 2.7</dd>
+</dl>
+</dd>
+</dl>
+<p># Test uploading a file
+<a class="reference external" href="https://docs.djangoproject.com/en/1.7/topics/testing/tools/#django.test.Client.post">https://docs.djangoproject.com/en/1.7/topics/testing/tools/#django.test.Client.post</a></p>
+<p>Submitting files is a special case. To POST a file, you need only provide the file field name as a key, and a file handle to the file you wish to upload as a value. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;wishlist.doc&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/customers/wishes/&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;fred&#39;</span><span class="p">,</span> <span class="s">&#39;attachment&#39;</span><span class="p">:</span> <span class="n">fp</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>(The name attachment here is not relevant; use whatever name your file-processing code expects.)</p>
+<p>Note that if you wish to use the same file handle for multiple post() calls then you will need to manually reset the file pointer between posts. The easiest way to do this is to manually close the file after it has been provided to post(), as demonstrated above.</p>
+<p>You should also ensure that the file is opened in a way that allows the data to be read. If your file contains binary data such as an image, this means you will need to open the file in rb (read binary) mode.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="settings.html"
+                        title="previous chapter">Settings</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="translation.html"
+                        title="next chapter">Translation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/test.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="translation.html" title="Translation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

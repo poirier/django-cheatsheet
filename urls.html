@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>URLs &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="prev" title="Translation" href="translation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="translation.html" title="Translation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="urls">
+<h1>URLs<a class="headerlink" href="#urls" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="reverse">
+<h2>reverse<a class="headerlink" href="#reverse" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="n">reverse</span><span class="p">(</span><span class="n">viewname</span><span class="o">=</span><span class="s">&#39;myview&#39;</span><span class="p">,</span>   <span class="c"># remaining args optional</span>
+        <span class="n">urlconf</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;pk&#39;</span><span class="p">:</span> <span class="n">foo</span><span class="o">.</span><span class="n">pk</span><span class="p">},</span>
+        <span class="n">current_app</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="redirect">
+<h2>redirect<a class="headerlink" href="#redirect" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt>
+<tt class="descname">redirect</tt><big>(</big><em>to</em>, <span class="optional">[</span><em>permanent=False</em>, <span class="optional">]</span><em>*args</em>, <em>**kwargs</em><big>)</big></dt>
+<dd><p>Returns an <tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt> to the appropriate URL
+for the arguments passed.</p>
+<p>The arguments could be:</p>
+<blockquote>
+<div><ul class="simple">
+<li>A model: the model&#8217;s <cite>get_absolute_url()</cite> function will be called.</li>
+<li>A view name, possibly with arguments: <cite>urlresolvers.reverse()</cite> will
+be used to reverse-resolve the name.</li>
+<li>A URL, which will be used as-is for the redirect location.</li>
+</ul>
+</div></blockquote>
+<p>By default issues a temporary redirect; pass <tt class="docutils literal"><span class="pre">permanent=True</span></tt> to issue a
+permanent redirect</p>
+</dd></dl>
+
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>You can use the <tt class="xref py py-func docutils literal"><span class="pre">redirect()</span></tt> function in a number of ways.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">By passing some object; that object&#8217;s
+<tt class="xref py py-meth docutils literal"><span class="pre">get_absolute_url()</span></tt> method will be called
+to figure out the redirect URL:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="nb">object</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">By passing the name of a view and optionally some positional or
+keyword arguments; the URL will be reverse resolved using the
+<tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt> method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;some-view-name&#39;</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">By passing a hardcoded URL to redirect to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;/some/url/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This also works with full URLs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;http://example.com/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>By default, <tt class="xref py py-func docutils literal"><span class="pre">redirect()</span></tt> returns a temporary redirect. All of the above
+forms accept a <tt class="docutils literal"><span class="pre">permanent</span></tt> argument; if set to <tt class="docutils literal"><span class="pre">True</span></tt> a permanent redirect
+will be returned:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="nb">object</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/http/urls/">https://docs.djangoproject.com/en/dev/topics/http/urls/</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span> <span class="n">admin</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^polls/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;polls.urls&#39;</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+<span class="p">)</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;polls.views&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^, &#39;</span><span class="n">index</span><span class="s">&#39;),</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;poll_id&gt;\d+)/, &#39;</span><span class="n">detail</span><span class="s">&#39;),</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;poll_id&gt;\d+)/results/, &#39;</span><span class="n">results</span><span class="s">&#39;),</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;poll_id&gt;\d+)/vote/, &#39;</span><span class="n">vote</span><span class="s">&#39;),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^(?P&lt;poll_id&gt;\d+)/foo/, &#39;</span><span class="n">fooview</span><span class="s">&#39;, name=&#39;</span><span class="n">app</span><span class="o">-</span><span class="n">viewname</span><span class="s">&#39;),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">URLs</a><ul>
+<li><a class="reference internal" href="#reverse">reverse</a></li>
+<li><a class="reference internal" href="#redirect">redirect</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="translation.html"
+                        title="previous chapter">Translation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/urls.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="translation.html" title="Translation"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

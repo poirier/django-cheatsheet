@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Logging &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Migrations" href="migrations.html" />
+    <link rel="prev" title="Forms" href="forms.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="migrations.html" title="Migrations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="logging">
+<h1>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<p>Some best practices for Django logging.</p>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/logging/">https://docs.djangoproject.com/en/dev/topics/logging/</a>
+<a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/logging/#configuring-logging">https://docs.djangoproject.com/en/dev/topics/logging/#configuring-logging</a></p>
+<p><a class="reference external" href="https://docs.python.org/2/howto/logging.html">https://docs.python.org/2/howto/logging.html</a></p>
+<p><a class="reference external" href="https://docs.python.org/2/library/logging.handlers.html#rotatingfilehandler">https://docs.python.org/2/library/logging.handlers.html#rotatingfilehandler</a>
+<a class="reference external" href="https://docs.python.org/2/library/logging.handlers.html#timedrotatingfilehandler">https://docs.python.org/2/library/logging.handlers.html#timedrotatingfilehandler</a></p>
+<p>INFO level logging for celery is very verbose</p>
+<p>If you have DEBUG on, Django logs all SQL queries</p>
+<div class="section" id="default">
+<h2>Default<a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s what Django uses (around 1.7, anyway) if you don&#8217;t configure logging:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Default logging for Django. This sends an email to the site admins on every</span>
+<span class="c"># HTTP 500 error. Depending on DEBUG, all other log records are either sent to</span>
+<span class="c"># the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).</span>
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;require_debug_false&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;()&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.RequireDebugFalse&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;require_debug_true&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;()&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.RequireDebugTrue&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;INFO&#39;</span><span class="p">,</span>
+            <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;require_debug_true&#39;</span><span class="p">],</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;null&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.NullHandler&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;mail_admins&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;require_debug_false&#39;</span><span class="p">],</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.AdminEmailHandler&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;django&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;mail_admins&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;django.security&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;mail_admins&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;py.warnings&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="console">
+<h2>Console<a class="headerlink" href="#console" title="Permalink to this headline">¶</a></h2>
+<p>Log errors to console in local.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">LOGGING</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s">&#39;formatters&#39;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">LOGGING</span><span class="p">[</span><span class="s">&#39;formatters&#39;</span><span class="p">][</span><span class="s">&#39;verbose&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;[</span><span class="si">%(name)s</span><span class="s">] Message &quot;</span><span class="si">%(message)s</span><span class="s">&quot; from </span><span class="si">%(pathname)s</span><span class="s">:</span><span class="si">%(lineno)d</span><span class="s"> in </span><span class="si">%(funcName)s</span><span class="s">&#39;</span>
+<span class="p">}</span>
+<span class="n">LOGGING</span><span class="p">[</span><span class="s">&#39;handlers&#39;</span><span class="p">][</span><span class="s">&#39;console&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+    <span class="s">&#39;formatter&#39;</span><span class="p">:</span> <span class="s">&#39;verbose&#39;</span><span class="p">,</span>
+    <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">LOGGING</span><span class="p">[</span><span class="s">&#39;loggers&#39;</span><span class="p">][</span><span class="s">&#39;django&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p>For local development, we want lots of output saved to a log file in case
+we need to look back at a problem, but no emailing of
+exceptions and such.</p>
+<p>In settings:</p>
+<div class="highlight-python"><div class="highlight"><pre>LOG_DIR = os.path.join(PROJECT_ROOT, &#39;..&#39;, &#39;log&#39;)
+
+LOGGING = {
+    &#39;version&#39;: 1,
+    &#39;disable_existing_loggers&#39;: False,
+    &#39;handlers&#39;: {
+        &#39;console&#39;: {  # Log to stdout
+            &#39;level&#39;: &#39;INFO&#39;,
+            &#39;class&#39;: &#39;logging.StreamHandler&#39;,
+        },
+        &#39;file&#39;: {
+            &#39;level&#39;: &#39;DEBUG&#39;,
+            &#39;class&#39;: &#39;logging.FileHandler&#39;,
+            &#39;filename&#39;: os.path.join(LOG_DIR, &#39;django_debug.log&#39;,
+        }
+    },
+    &#39;root&#39;: {  # For dev, show errors + some info in the console
+        &#39;handlers&#39;: [&#39;console&#39;],
+        &#39;level&#39;: &#39;INFO&#39;,
+    },
+    &#39;loggers&#39;: {
+        &#39;django.request&#39;: {  # debug logging of things that break requests
+            &#39;handlers&#39;: [&#39;file&#39;],
+            &#39;level&#39;: &#39;DEBUG&#39;,
+            &#39;propagate&#39;: True,
+        },
+    },
+}
+</pre></div>
+</div>
+<p>Or how about:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>LOGGING = {</dt>
+<dd><p class="first">&#8216;version&#8217;: 1,
+&#8216;disable_existing_loggers&#8217;: False,
+&#8216;formatters&#8217;: {</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;simple&#8217;: {</dt>
+<dd>&#8216;format&#8217;: &#8216;%(name)-20s %(levelname)-8s %(message)s&#8217;,</dd>
+</dl>
+<p>},</p>
+</div></blockquote>
+<p>},
+&#8216;handlers&#8217;: {</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;console&#8217;: {  # Log to stdout</dt>
+<dd>&#8216;level&#8217;: &#8216;INFO&#8217;,
+&#8216;class&#8217;: &#8216;logging.StreamHandler&#8217;,
+&#8216;formatter&#8217;: &#8216;simple&#8217;,</dd>
+</dl>
+<p>},</p>
+</div></blockquote>
+<p>},
+&#8216;root&#8217;: {  # For dev, show errors + some info in the console</p>
+<blockquote>
+<div>&#8216;handlers&#8217;: [&#8216;console&#8217;],
+&#8216;level&#8217;: &#8216;INFO&#8217;,</div></blockquote>
+<p class="last">},</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+</div>
+<div class="section" id="staging">
+<h2>Staging<a class="headerlink" href="#staging" title="Permalink to this headline">¶</a></h2>
+<p>FIXME: Add celery exceptions</p>
+<p>&#64;tobiasmcnulty also mentioned: &#8220;re: celery error emails, this is a good setting to have enabled: <a class="reference external" href="http://celery.readthedocs.org/en/latest/configuration.html#celery-send-task-error-emails">http://celery.readthedocs.org/en/latest/configuration.html#celery-send-task-error-emails</a>&#8220;</p>
+<p>On staging, we still want lots of info logged semi-permanently (to files),
+but we also want to be emailed about exceptions to make sure
+we find out about problems before we deploy them to production.</p>
+<p>Emails should go to the devs, not the client or production site admins.</p>
+<p>Like so:</p>
+<div class="highlight-python"><div class="highlight"><pre>ADMINS = (
+    (&#39;XXX DevTeam&#39;, &#39;xxx-dev-team@example.com&#39;),
+)
+
+LOG_DIR = os.path.join(PROJECT_ROOT, &#39;..&#39;, &#39;log&#39;)
+
+LOGGING = {
+    &#39;version&#39;: 1,
+    &#39;disable_existing_loggers&#39;: False,
+    &#39;handlers&#39;: {
+        &#39;file&#39;: {  # Rotate log file daily, only keep 1 backup
+            &#39;level&#39;: &#39;DEBUG&#39;,
+            &#39;class&#39;: &#39;logging.handlers.TimedRotatingFileHandler&#39;,
+            &#39;filename&#39;: os.path.join(LOG_DIR, &#39;django_debug.log&#39;,
+            &#39;when&#39;: &#39;d&#39;,
+            &#39;interval&#39;: 1,
+            &#39;backupCount&#39;: 1,
+        },
+        &#39;mail_admins&#39;: {
+            &#39;level&#39;: &#39;ERROR&#39;,
+            &#39;class&#39;: &#39;django.utils.log.AdminEmailHandler&#39;
+        },
+    },
+    # EMAIL all errors (might not want this, but let&#39;s try it)
+    &#39;root&#39;: {
+        &#39;handlers&#39;: [&#39;mail_admins&#39;],
+        &#39;level&#39;: &#39;ERROR&#39;,
+    },
+    &#39;loggers&#39;: {
+        &#39;django.request&#39;: {
+            &#39;handlers&#39;: [&#39;file&#39;],
+            &#39;level&#39;: &#39;INFO&#39;,
+            &#39;propagate&#39;: True,
+        },
+    },
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="production">
+<h2>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h2>
+<p>Mark says: for production I like to log to syslog which can then be shipped elsewhere without changing the application</p>
+<p>(<a class="reference external" href="https://docs.python.org/2/library/logging.handlers.html#logging.handlers.SysLogHandler">https://docs.python.org/2/library/logging.handlers.html#logging.handlers.SysLogHandler</a> ?)</p>
+<p>&#64;Scottm and I have been talking about making that more common: log to syslog, ship to Logstash, monitor via Kibana <a class="reference external" href="http://www.elasticsearch.org/overview/kibana/">http://www.elasticsearch.org/overview/kibana/</a></p>
+<p>getting Nginx to log to syslog is kind of a pain
+you basically have to get syslog to monitor the file and ship it
+Logstash + Kibana looks much easier to manage/configure than Graylog2</p>
+<p>the plan was to add it to Ona but that isn&#8217;t done yet (as of Aug 28, 2014)
+CCSR was/is using Graylog2
+Minidam does syslog &#8211;&gt; Loggly
+libya is using logstash -&gt; graylog (in addition to sentry)</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s what we&#8217;ve got set up for Django logging on one project.  This sends everything
+level INFO and higher to a local log file and a Graylog instance. Anything ERROR and
+higher is emailed to admins and sent to a Sentry instance, which can send more notifications.</p>
+<p>In environment:</p>
+<div class="highlight-python"><div class="highlight"><pre>SENTRY_DSN: http://long_hex_string:long_hex_string@hostname:9000/3
+</pre></div>
+</div>
+<p>Requirements:</p>
+<div class="highlight-python"><div class="highlight"><pre>raven==3.6.1
+</pre></div>
+</div>
+<p>Settings:</p>
+<div class="highlight-python"><div class="highlight"><pre>INSTALLED_APPS = (
+    ...
+    &#39;raven.contrib.django.raven_compat&#39;,  # Sentry logging client
+    ...
+}
+
+CELERY_SEND_TASK_ERROR_EMAILS = True
+
+# Send ERRORS to email and sentry.
+# Send a fair bit of info to graylog and a local log file
+# (but not debug level messages, ordinarily).
+LOGGING = {
+    &#39;version&#39;: 1,
+    &#39;disable_existing_loggers&#39;: True,
+    &#39;filters&#39;: {
+        # This filter strips out request information from the message record
+        # so it can be sent to Graylog (the request object is not picklable).
+        &#39;django_exc&#39;: {
+            &#39;()&#39;: &#39;our_filters.RequestFilter&#39;,
+        },
+        &#39;require_debug_false&#39;: {
+            &#39;()&#39;: &#39;django.utils.log.RequireDebugFalse&#39;
+        },
+        # This filter adds some identifying information to each message, to make
+        # it easier to filter them further, e.g. in Graylog.
+        &#39;static_fields&#39;: {
+            &#39;()&#39;: &#39;our_filters.StaticFieldFilter&#39;,
+            &#39;fields&#39;: {
+                &#39;deployment&#39;: &#39;project_name&#39;,
+                &#39;environment&#39;: &#39;staging&#39;   # can be overridden, e.g. &#39;staging&#39; or &#39;production&#39;
+            },
+        },
+    },
+    &#39;formatters&#39;: {
+        &#39;basic&#39;: {
+            &#39;format&#39;: &#39;%(asctime)s %(name)-20s %(levelname)-8s %(message)s&#39;,
+        },
+    },
+    &#39;handlers&#39;: {
+        &#39;file&#39;: {
+            &#39;level&#39;: &#39;DEBUG&#39;,  # Nothing here logs DEBUG level messages ordinarily
+            &#39;class&#39;: &#39;logging.handlers.RotatingFileHandler&#39;,
+            &#39;formatter&#39;: &#39;basic&#39;,
+            &#39;filename&#39;: os.path.join(LOG_ROOT, &#39;django.log&#39;),
+            &#39;maxBytes&#39;: 10 * 1024 * 1024,  # 10 MB
+            &#39;backupCount&#39;: 10,
+        },
+        &#39;graylog&#39;: {
+            &#39;level&#39;: &#39;INFO&#39;,
+            &#39;class&#39;: &#39;graypy.GELFHandler&#39;,
+            &#39;host&#39;: env_or_default(&#39;GRAYLOG_HOST&#39;, &#39;monitor.caktusgroup.com&#39;),
+            &#39;port&#39;: 12201,
+            &#39;filters&#39;: [&#39;static_fields&#39;, &#39;django_exc&#39;],
+        },
+        &#39;mail_admins&#39;: {
+            &#39;level&#39;: &#39;ERROR&#39;,
+            &#39;class&#39;: &#39;django.utils.log.AdminEmailHandler&#39;,
+            &#39;include_html&#39;: False,
+            &#39;filters&#39;: [&#39;require_debug_false&#39;],
+        },
+        &#39;sentry&#39;: {
+            &#39;level&#39;: &#39;ERROR&#39;,
+            &#39;class&#39;: &#39;raven.contrib.django.raven_compat.handlers.SentryHandler&#39;,
+        },
+    },
+    &#39;root&#39;: {
+        # graylog (or any handler using the &#39;django_exc&#39; filter ) should be last
+        # because it will alter the LogRecord by removing the `request` field
+        &#39;handlers&#39;: [&#39;file&#39;, &#39;mail_admins&#39;, &#39;sentry&#39;, &#39;graylog&#39;],
+        &#39;level&#39;: &#39;WARNING&#39;,
+    },
+    &#39;loggers&#39;: {
+        # These 2 loggers must be specified, otherwise they get disabled
+        # because they are specified by django&#39;s DEFAULT_LOGGING and then
+        # disabled by our &#39;disable_existing_loggers&#39; setting above.
+        # BEGIN required loggers #
+        &#39;django&#39;: {
+            &#39;handlers&#39;: [],
+            &#39;propagate&#39;: True,
+        },
+        &#39;py.warnings&#39;: {
+            &#39;handlers&#39;: [],
+            &#39;propagate&#39;: True,
+        },
+        # END required loggers #
+        # The root logger will log anything WARNING and higher, so there&#39;s
+        # no reason to add loggers here except to add logging of lower-level information.
+        &#39;libya_elections&#39;: {
+            &#39;handlers&#39;: [&#39;file&#39;, &#39;graylog&#39;],
+            &#39;level&#39;: &#39;INFO&#39;,
+        },
+        &#39;nlid&#39;: {
+            &#39;handlers&#39;: [&#39;file&#39;, &#39;graylog&#39;],
+            &#39;level&#39;: &#39;INFO&#39;,
+        },
+        &#39;register&#39;: {
+            &#39;handlers&#39;: [&#39;file&#39;, &#39;graylog&#39;],
+            &#39;level&#39;: &#39;INFO&#39;,
+        },
+        &#39;bulk_sms&#39;: {
+            &#39;handlers&#39;: [&#39;file&#39;, &#39;graylog&#39;],
+            &#39;level&#39;: &#39;INFO&#39;,
+        },
+    }
+}
+
+#
+# our_filters.py
+#
+import logging
+
+
+class QuotelessStr(str):
+    &quot;&quot;&quot;
+    Return the repr() of this string *without* quotes.  This is a
+    temporary fix until https://github.com/severb/graypy/pull/34 is resolved.
+    &quot;&quot;&quot;
+    def __repr__(self):
+        return self
+
+
+class StaticFieldFilter(logging.Filter):
+    &quot;&quot;&quot;
+    Python logging filter that adds the given static contextual information
+    in the ``fields`` dictionary to all logging records.
+    &quot;&quot;&quot;
+    def __init__(self, fields):
+        self.static_fields = fields
+
+    def filter(self, record):
+        for k, v in self.static_fields.items():
+            setattr(record, k, QuotelessStr(v))
+        return True
+
+
+class RequestFilter(logging.Filter):
+    &quot;&quot;&quot;
+    Python logging filter that removes the (non-pickable) Django ``request``
+    object from the logging record.
+    &quot;&quot;&quot;
+    def filter(self, record):
+        if hasattr(record, &#39;request&#39;):
+            del record.request
+        return True
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Logging</a><ul>
+<li><a class="reference internal" href="#default">Default</a></li>
+<li><a class="reference internal" href="#console">Console</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
+<li><a class="reference internal" href="#staging">Staging</a></li>
+<li><a class="reference internal" href="#production">Production</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="forms.html"
+                        title="previous chapter">Forms</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="migrations.html"
+                        title="next chapter">Migrations</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/logging.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="migrations.html" title="Migrations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

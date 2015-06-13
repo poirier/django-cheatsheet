@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fabric &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Forms" href="forms.html" />
+    <link rel="prev" title="Email" href="email.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="email.html" title="Email"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fabric">
+<h1>Fabric<a class="headerlink" href="#fabric" title="Permalink to this headline">¶</a></h1>
+<p>&#64;task
+def db_backup():</p>
+<blockquote>
+<div>&#8220;&#8221;&#8221;
+Backup the database to S3 just like the nightly cron job
+&#8220;&#8221;&#8221;
+require(&#8216;environment&#8217;)
+require(&#8216;instance&#8217;, provided_by=&#8217;instance&#8217;)
+manage_run(&#8220;dbbackup &#8211;encrypt&#8221;)</div></blockquote>
+<dl class="docutils">
+<dt>def db_exists(dbname):</dt>
+<dd>&#8220;&#8221;&#8221;
+Return True if a db named DBNAME exists on the remote host.
+&#8220;&#8221;&#8221;
+require(&#8216;environment&#8217;, provided_by=SERVER_ENVIRONMENTS)
+output = sudo(&#8216;psql -l &#8211;pset=format=unaligned&#8217;, user=&#8217;postgres&#8217;)
+dbnames = [line.split(&#8216;|&#8217;)[0] for line in output.splitlines()]
+return dbname in dbnames</dd>
+</dl>
+<p>&#64;task
+def db_dump(file):</p>
+<blockquote>
+<div><p>&#8220;&#8221;&#8221;
+Dump an instance&#8217;s database to a remote file.</p>
+<p>Example:</p>
+<blockquote>
+<div><cite>fab staging instance:iraq db_dump:/tmp/staging_iraq.dump</cite></div></blockquote>
+<p>dumps to staging_iraq.dump
+&#8220;&#8221;&#8221;
+require(&#8216;environment&#8217;, provided_by=SERVER_ENVIRONMENTS)
+require(&#8216;instance&#8217;, provided_by=&#8217;instance&#8217;)
+remote_file = file</p>
+<dl class="docutils">
+<dt>if files.exists(file):</dt>
+<dd><dl class="first last docutils">
+<dt>if not confirm(&#8220;Remote file {file} exists and will be overwritten.  Okay?&#8221;</dt>
+<dd><blockquote class="first">
+<div>.format(file=remote_file)):</div></blockquote>
+<p class="last">abort(&#8220;ERROR: aborting&#8221;)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p># Don&#8217;t need remote DB user and password because we&#8217;re going to run pg_dump as user postgres
+sudo(&#8216;pg_dump &#8211;format=custom &#8211;file={outputfile} {dbname}&#8217;</p>
+<blockquote>
+<div>.format(dbname=env.db_name, outputfile=remote_file),
+user=&#8217;postgres&#8217;)</div></blockquote>
+<dl class="docutils">
+<dt>print(&#8220;Database from {environment} {instance} has been dumped to remote file {file}&#8221;</dt>
+<dd>.format(environment=env.environment, instance=env.instance, file=remote_file))</dd>
+</dl>
+</div></blockquote>
+<p>&#64;task
+def local_restore(file):</p>
+<blockquote>
+<div>&#8220;&#8221;&#8221;
+Restore a local dump file to the local instance&#8217;s database.
+:param file:
+:return:
+&#8220;&#8221;&#8221;
+# Find out the local DB settings
+import sys
+sys.path[0:0] = [&#8216;.&#8217;]
+from cts.settings.local import DATABASES
+DB = DATABASES[&#8216;default&#8217;]
+assert DB[&#8216;ENGINE&#8217;] == &#8216;django.contrib.gis.db.backends.postgis&#8217;
+dbname = DB[&#8216;NAME&#8217;]
+owner = DB[&#8216;USER&#8217;] or os.getenv(&#8216;USER&#8217;)
+local(&#8216;dropdb {dbname} || true&#8217;.format(dbname=dbname), shell=&#8221;/bin/sh&#8221;)
+local(&#8216;createdb &#8211;encoding UTF8 &#8211;lc-collate=en_US.UTF-8 &#8211;lc-ctype=en_US.UTF-8 &#8211;template=template0 &#8211;owner {owner} {dbname}&#8217;.format(owner=owner, dbname=dbname))
+local(&#8216;sudo -u postgres pg_restore -Ox -j4 &#8211;dbname={dbname} {file}&#8217;.format(dbname=dbname, file=file))</div></blockquote>
+<p>&#64;task
+def db_restore(file):</p>
+<blockquote>
+<div><p>&#8220;&#8221;&#8221;
+Restore a remote DB dump file to a remote instance&#8217;s database.</p>
+<p>This will rename the existing database to {previous_name}_bak
+and create a completely new database with what&#8217;s in the dump.</p>
+<p>If there&#8217;s already a backup database, the restore will fail.</p>
+<p>Example:</p>
+<blockquote>
+<div><cite>fab staging instance:iraq db_restore:/tmp/staging_iraq.dump</cite></div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">param file:</th><td class="field-body">The remote file to restore.</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;&#8221;&#8221;
+require(&#8216;environment&#8217;, provided_by=SERVER_ENVIRONMENTS)
+require(&#8216;instance&#8217;, provided_by=&#8217;instance&#8217;)</p>
+<p>renamed = False
+restored = False</p>
+<dl class="docutils">
+<dt>if not files.exists(file):</dt>
+<dd>abort(&#8220;Remote file {file} does not exist&#8221;.format(file=file))</dd>
+<dt>try:</dt>
+<dd><dl class="first docutils">
+<dt>if db_exists(env.db_name):</dt>
+<dd><p class="first"># Rename existing DB to backup
+db_backup = &#8216;{dbname}_bak&#8217;.format(dbname=env.db_name)
+if db_exists(db_backup):</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>if confirm(&#8220;There&#8217;s already a database named {db_backup}. Replace with new backup?&#8221;</dt>
+<dd><blockquote class="first">
+<div>.format(db_backup=db_backup)):</div></blockquote>
+<dl class="last docutils">
+<dt>sudo(&#8216;dropdb {db_backup}&#8217;.format(db_backup=db_backup),</dt>
+<dd>user=&#8217;postgres&#8217;)</dd>
+</dl>
+</dd>
+<dt>else:</dt>
+<dd><dl class="first last docutils">
+<dt>abort(&#8220;ERROR: There&#8217;s already a database named {db_backup}. &#8220;</dt>
+<dd>&#8220;Restoring would clobber it.&#8221;
+.format(db_backup=db_backup))</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>sudo(&#8216;psql -c &#8220;ALTER DATABASE {dbname} RENAME TO {db_backup}&#8221;&#8217;</dt>
+<dd>.format(dbname=env.db_name, db_backup=db_backup),
+user=&#8217;postgres&#8217;)</dd>
+</dl>
+<p class="last">renamed = True
+print(&#8220;Renamed {dbname} to {db_backup}&#8221;.format(dbname=env.db_name, db_backup=db_backup))</p>
+</dd>
+</dl>
+<p>remote_file = file</p>
+<p># Create new, very empty database.
+# * We can&#8217;t use &#8211;create on the pg_restore because that will always restore to whatever
+#   db name was saved in the dump file, and we don&#8217;t want to be restricted that way.
+# * Any extensions the backed-up database had will be included in the restore, so we
+#   don&#8217;t need to enable them now.</p>
+<p># If these parameters change, also change the parameters in conf/salt/project/db/init.sls
+# (TODO: we could use the output of psql -l to copy most of these settings from the
+# existing database.)
+sudo(&#8216;createdb &#8211;encoding UTF8 &#8211;lc-collate=en_US.UTF-8 &#8216;</p>
+<blockquote>
+<div>&#8216;&#8211;lc-ctype=en_US.UTF-8 &#8211;template=template0 &#8211;owner {owner} {dbname}&#8217;
+.format(dbname=env.db_name, owner=env.db_owner),
+user=&#8217;postgres&#8217;)</div></blockquote>
+<p># Don&#8217;t need remote DB user and password because we&#8217;re going to
+# run pg_restore as user postgres
+sudo(&#8216;pg_restore -1 &#8211;dbname={dbname} {filename}&#8217;</p>
+<blockquote>
+<div>.format(dbname=env.db_name, filename=remote_file),
+user=&#8217;postgres&#8217;)</div></blockquote>
+<p>restored = True</p>
+<p># Run ANALYZE on the db to help Postgres optimize how it accesses it
+sudo(&#8216;psql {dbname} -c ANALYZE&#8217;.format(dbname=env.db_name),</p>
+<blockquote>
+<div>user=&#8217;postgres&#8217;)</div></blockquote>
+<dl class="last docutils">
+<dt>print(&#8220;Database for {environment} {instance} has been restored from remote file {file}&#8221;</dt>
+<dd>.format(environment=env.environment, instance=env.instance, file=remote_file))</dd>
+</dl>
+</dd>
+<dt>finally:</dt>
+<dd><dl class="first last docutils">
+<dt>if renamed and not restored:</dt>
+<dd><p class="first">print(&#8220;Error occurred after renaming current database, trying to rename it back&#8221;)
+if db_exists(env.db_name):</p>
+<blockquote>
+<div># We already created the new db, but restore failed; delete it
+sudo(&#8216;dropdb {dbname}&#8217;.format(dbname=env.dbname), user=&#8217;postgres&#8217;)</div></blockquote>
+<dl class="docutils">
+<dt>sudo(&#8216;psql -c &#8220;ALTER DATABASE {db_backup} RENAME TO {dbname}&#8221;&#8217;</dt>
+<dd>.format(dbname=env.db_name, db_backup=db_backup),
+user=&#8217;postgres&#8217;)</dd>
+</dl>
+<p class="last">print(&#8220;Successfully put back the original database.&#8221;)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="email.html"
+                        title="previous chapter">Email</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="forms.html"
+                        title="next chapter">Forms</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fabric.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="forms.html" title="Forms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="email.html" title="Email"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

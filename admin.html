@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Admin &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Celery" href="celery.html" />
+    <link rel="prev" title="Welcome to Django Cheat-sheet’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="celery.html" title="Celery"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Django Cheat-sheet’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="admin">
+<h1>Admin<a class="headerlink" href="#admin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="urls">
+<h2>URLs<a class="headerlink" href="#urls" title="Permalink to this headline">¶</a></h2>
+<p>List            {{ app_label }}_{{ model_name }}_changelist
+Change  {{ app_label }}_{{ model_name }}_change object_id</p>
+<p><a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#reversing-admin-urls">https://docs.djangoproject.com/en/dev/ref/contrib/admin/#reversing-admin-urls</a></p>
+</div>
+<div class="section" id="customize-top-right-corner-of-admin-pages">
+<h2>Customize top-right corner of admin pages<a class="headerlink" href="#customize-top-right-corner-of-admin-pages" title="Permalink to this headline">¶</a></h2>
+<p>Create your own <cite>templates/admin/base_site.html</cite> that comes ahead of the
+admin&#8217;s default one in the templates path.</p>
+<p>At least in Django 1.8+, this gives you a &#8220;View site&#8221; link for free:</p>
+<blockquote>
+<div><p>% extends &#8220;admin/base.html&#8221; %}</p>
+<p>{% block title %}{{ title }} | {{ site_title|default:_(&#8216;Django site admin&#8217;) }}{% endblock %}</p>
+<p>{% block branding %}
+&lt;h1 id=&#8221;site-name&#8221;&gt;&lt;a href=&#8221;{% url &#8216;admin:index&#8217; %}&#8221;&gt;{{ site_header|default:_(&#8216;Django administration&#8217;) }}&lt;/a&gt;&lt;/h1&gt;
+{% endblock %}</p>
+<dl class="docutils">
+<dt>{% block userlinks %}</dt>
+<dd>&lt;a href=&#8221;{% url &#8220;clear-cache&#8221; %}&#8221;&gt;Clear cache&lt;/a&gt; /
+{{ block.super }}</dd>
+</dl>
+<p>{% endblock userlinks %}</p>
+</div></blockquote>
+<p>Prior to Django 1.8:</p>
+<blockquote>
+<div><p>{% extends &#8220;admin/base.html&#8221; %}</p>
+<p>{% block title %}{{ title }} | Caktus Admin{% endblock %}</p>
+<p>{% block branding %}&lt;h1 id=&#8221;site-name&#8221;&gt;Caktus Admin&lt;/h1&gt;{% endblock %}</p>
+<dl class="docutils">
+<dt>{% block nav-global %}</dt>
+<dd><dl class="first docutils">
+<dt>&lt;div style=&#8217;display:block; padding:0 1em 0.5em 1em; float:right;&#8217;&gt;</dt>
+<dd>&lt;a href=&#8217;{% url &#8220;home&#8221; %}&#8217;&gt;Return to Caktus Home&lt;/a&gt;
+| &lt;a href=&#8217;{% url &#8220;clear-cache&#8221; %}&#8217;&gt;Clear cache&lt;/a&gt;</dd>
+</dl>
+<p class="last">&lt;/div&gt;</p>
+</dd>
+</dl>
+<p>{% endblock %}</p>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Admin</a><ul>
+<li><a class="reference internal" href="#urls">URLs</a></li>
+<li><a class="reference internal" href="#customize-top-right-corner-of-admin-pages">Customize top-right corner of admin pages</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Django Cheat-sheet&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="celery.html"
+                        title="next chapter">Celery</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/admin.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="celery.html" title="Celery"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Django Cheat-sheet’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

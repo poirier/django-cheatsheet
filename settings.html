@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Settings &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Testing" href="test.html" />
+    <link rel="prev" title="Security" href="security.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="test.html" title="Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="security.html" title="Security"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="settings">
+<h1>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-the-right-one">
+<h2>Using the right one<a class="headerlink" href="#using-the-right-one" title="Permalink to this headline">¶</a></h2>
+<p>Baumgartner suggests symlinking the desired one (e.g. <cite>dev.py</cite> or <cite>deploy.py</cite>)
+to <cite>local.py</cite> and hard-coding that in <cite>manage.py</cite>.</p>
+<p>Greenfelds suggest... (FILL THIS IN)</p>
+</div>
+<div class="section" id="secret-key">
+<h2>Secret key<a class="headerlink" href="#secret-key" title="Permalink to this headline">¶</a></h2>
+<p>Generate a secret key:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.utils.crypto</span> <span class="kn">import</span> <span class="n">get_random_string</span>
+<span class="n">chars</span> <span class="o">=</span> <span class="s">&#39;abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&amp;*(-_=+)&#39;</span>
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">get_random_string</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">chars</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26">https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26</a>)</p>
+</div>
+<div class="section" id="env-vars">
+<h2>Env vars<a class="headerlink" href="#env-vars" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you have env vars in a .env file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SECRET_KEY</span><span class="o">=</span><span class="n">jdfsdfsdf</span>
+<span class="n">PASSWORD</span><span class="o">=</span><span class="n">jsdkfjsdlkfjdsf</span>
+</pre></div>
+</div>
+<p>You can load them into Django using <a class="reference external" href="https://github.com/jacobian/django-dotenv">dotenv</a>.
+Pop open <cite>manage.py</cite>. Add:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">dotenv</span>
+<span class="n">dotenv</span><span class="o">.</span><span class="n">read_dotenv</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Or in a settings file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;SECRET_KEY&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And if they&#8217;re not all strings, use ast:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ast</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s">&quot;True&quot;</span><span class="p">))</span>
+<span class="n">TEMPLATE_DIRS</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;TEMPLATE_DIRS&quot;</span><span class="p">,</span> <span class="s">&quot;/path1,/path2&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You can load them into a shell this way:</p>
+<div class="highlight-python"><div class="highlight"><pre>export $(cat .env | grep -v ^# | xargs)
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Settings</a><ul>
+<li><a class="reference internal" href="#using-the-right-one">Using the right one</a></li>
+<li><a class="reference internal" href="#secret-key">Secret key</a></li>
+<li><a class="reference internal" href="#env-vars">Env vars</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="security.html"
+                        title="previous chapter">Security</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="test.html"
+                        title="next chapter">Testing</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/settings.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="test.html" title="Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="security.html" title="Security"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

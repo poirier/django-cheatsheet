@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NGINX &mdash; Django Cheat-sheet 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Cheat-sheet 0.2 documentation" href="index.html" />
+    <link rel="next" title="Permissions" href="permissions.html" />
+    <link rel="prev" title="MySQL with Django" href="mysql.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="permissions.html" title="Permissions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mysql.html" title="MySQL with Django"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="nginx">
+<span id="id1"></span><h1>NGINX<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h1>
+<p>Some tips on Nginx for use with Django</p>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p>Just add a new file to <tt class="docutils literal"><span class="pre">/etc/nginx/sites-eanbled</span></tt> for each site,
+making sure <tt class="docutils literal"><span class="pre">server_name</span></tt> is set correctly in each.</p>
+</div>
+<div class="section" id="redirecting-to-ssl">
+<h2>Redirecting to SSL<a class="headerlink" href="#redirecting-to-ssl" title="Permalink to this headline">¶</a></h2>
+<p>We usually want to force SSL:</p>
+<div class="highlight-python"><div class="highlight"><pre>server {
+  listen *:80;
+  listen [::]:80;
+  server_name DOMAIN;
+  access_log PATHo_access.log;
+  error_log PATH_error.log;
+  return 301 https://DOMAIN$request_uri;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="proxying-to-gunicorn">
+<h2>Proxying to gunicorn<a class="headerlink" href="#proxying-to-gunicorn" title="Permalink to this headline">¶</a></h2>
+<p>Serve static and media files with nginx, and proxy everything
+else to Django:</p>
+<div class="highlight-python"><div class="highlight"><pre>upstream django {
+  server unix:/tmp/PATH fail_timeout=0;
+}
+
+server {
+  listen *:443 ssl;   # add spdy here too if you want
+  listen [::]:443 ssl;
+  server_name DOMAIN;
+  ssl_certificate PATH.crt;
+  ssl_certificate_key PATH.key;
+
+  access_log PATH_access.log;
+  error_log PATH_error.log;
+  root PATH;
+  location /media {
+    alias PATH;
+  }
+  location /static {
+    alias PATH;
+  }
+  location / {
+    client_max_body_size 500M;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $host;
+    proxy_redirect off;
+    proxy_buffering on;
+    proxy_intercept_errors on;
+    proxy_pass http://django;
+  }
+
+  # See https://www.trevorparker.com/hardening-ssl-in-nginx/
+  ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers on;
+  ssl_ciphers               DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:ECDHE-RSA-AES1\
+28-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM\
+-SHA384:kEDH+AESGCM:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES\
+256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SH\
+A256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SH\
+A384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SH\
+A256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:\
+!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA;
+  ssl_session_timeout       5m;
+  ssl_session_cache         shared:SSL:10m;
+
+  add_header Strict-Transport-Security max-age=31536000;
+}
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NGINX</a><ul>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#redirecting-to-ssl">Redirecting to SSL</a></li>
+<li><a class="reference internal" href="#proxying-to-gunicorn">Proxying to gunicorn</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mysql.html"
+                        title="previous chapter">MySQL with Django</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="permissions.html"
+                        title="next chapter">Permissions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/nginx.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="permissions.html" title="Permissions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mysql.html" title="MySQL with Django"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Cheat-sheet 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dan Poirier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
