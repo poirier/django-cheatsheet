@@ -8,7 +8,7 @@ API
 
 Send one email::
 
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)¶
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
 
 Email backends/handlers

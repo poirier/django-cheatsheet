@@ -1,23 +1,7 @@
-MySQL with Django
-=================
+MySQL - General tips
+====================
 
-Ubuntu: need to install (to use MySQL with Django)::
-
-   sudo apt-get install mysql-client mysql-server libmysqlclient-dev
-
-Django::
-
-   pip install MySQL-python
-
-   DATABASES['default'] = {
-      'ENGINE': 'django.db.backends.mysql',
-      'NAME': 'dbname',
-      'USER': 'username',
-   }
-
-
-General MySQL tips
-------------------
+(These are not Django-specific.)
 
 Starting the client::
 
