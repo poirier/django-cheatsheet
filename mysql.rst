@@ -7,7 +7,7 @@ Ubuntu: need to install (to use MySQL with Django)::
 
 Django::
 
-   pip install MySQL-python
+   pip install mysqlclient
 
    DATABASES['default'] = {
       'ENGINE': 'django.db.backends.mysql',
