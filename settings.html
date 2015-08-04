@@ -60,6 +60,9 @@
 <p>Baumgartner suggests symlinking the desired one (e.g. <cite>dev.py</cite> or <cite>deploy.py</cite>)
 to <cite>local.py</cite> and hard-coding that in <cite>manage.py</cite>.</p>
 <p>Greenfelds suggest... (FILL THIS IN)</p>
+<p>12-factor says there should only be one settings file, and any values
+that vary by deploy should be pulled from the environment.
+See <a class="reference internal" href="#envvars"><span>Env vars</span></a>.</p>
 </div>
 <div class="section" id="secret-key">
 <h2>Secret key<a class="headerlink" href="#secret-key" title="Permalink to this headline">¶</a></h2>
@@ -72,7 +75,7 @@ to <cite>local.py</cite> and hard-coding that in <cite>manage.py</cite>.</p>
 <p>(<a class="reference external" href="https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26">https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26</a>)</p>
 </div>
 <div class="section" id="env-vars">
-<h2>Env vars<a class="headerlink" href="#env-vars" title="Permalink to this headline">¶</a></h2>
+<span id="envvars"></span><h2>Env vars<a class="headerlink" href="#env-vars" title="Permalink to this headline">¶</a></h2>
 <p>Suppose you have env vars in a .env file:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">SECRET_KEY</span><span class="o">=</span><span class="n">jdfsdfsdf</span>
 <span class="n">PASSWORD</span><span class="o">=</span><span class="n">jsdkfjsdlkfjdsf</span>
