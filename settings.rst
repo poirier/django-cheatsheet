@@ -9,6 +9,10 @@ to `local.py` and hard-coding that in `manage.py`.
 
 Greenfelds suggest... (FILL THIS IN)
 
+12-factor says there should only be one settings file, and any values
+that vary by deploy should be pulled from the environment.
+See :ref:`envvars`.
+
 Secret key
 ----------
 
@@ -21,6 +25,8 @@ Generate a secret key:
     SECRET_KEY = get_random_string(50, chars)
 
 (https://github.com/django/django/blob/master/django/core/management/commands/startproject.py#L26)
+
+.. _envvars:
 
 Env vars
 --------
