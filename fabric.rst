@@ -1,7 +1,9 @@
 Fabric
 ======
 
+Sample tasks::
 
+<<<<<<< HEAD
 Common tasks::
 
     @task
@@ -30,13 +32,163 @@ Common tasks::
         Dump an instance's database to a remote file.
 
         Example:
+||||||| merged common ancestors
+@task
+def db_backup():
+    """
+    Backup the database to S3 just like the nightly cron job
+    """
+    require('environment')
+    require('instance', provided_by='instance')
+    manage_run("dbbackup --encrypt")
 
+
+def db_exists(dbname):
+    """
+    Return True if a db named DBNAME exists on the remote host.
+    """
+    require('environment', provided_by=SERVER_ENVIRONMENTS)
+    output = sudo('psql -l --pset=format=unaligned', user='postgres')
+    dbnames = [line.split('|')[0] for line in output.splitlines()]
+    return dbname in dbnames
+
+
+@task
+def db_dump(file):
+    """
+    Dump an instance's database to a remote file.
+
+    Example:
+
+      `fab staging instance:iraq db_dump:/tmp/staging_iraq.dump`
+
+    dumps to staging_iraq.dump
+    """
+    require('environment', provided_by=SERVER_ENVIRONMENTS)
+    require('instance', provided_by='instance')
+    remote_file = file
+
+    if files.exists(file):
+        if not confirm("Remote file {file} exists and will be overwritten.  Okay?"
+                .format(file=remote_file)):
+            abort("ERROR: aborting")
+
+    # Don't need remote DB user and password because we're going to run pg_dump as user postgres
+    sudo('pg_dump --format=custom --file={outputfile} {dbname}'
+         .format(dbname=env.db_name, outputfile=remote_file),
+         user='postgres')
+    print("Database from {environment} {instance} has been dumped to remote file {file}"
+          .format(environment=env.environment, instance=env.instance, file=remote_file))
+
+
+@task
+def local_restore(file):
+    """
+    Restore a local dump file to the local instance's database.
+    :param file:
+    :return:
+    """
+    # Find out the local DB settings
+    import sys
+    sys.path[0:0] = ['.']
+    from cts.settings.local import DATABASES
+    DB = DATABASES['default']
+    assert DB['ENGINE'] == 'django.contrib.gis.db.backends.postgis'
+    dbname = DB['NAME']
+    owner = DB['USER'] or os.getenv('USER')
+    local('dropdb {dbname} || true'.format(dbname=dbname), shell="/bin/sh")
+    local('createdb --encoding UTF8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --template=template0 --owner {owner} {dbname}'.format(owner=owner, dbname=dbname))
+    local('sudo -u postgres pg_restore -Ox -j4 --dbname={dbname} {file}'.format(dbname=dbname, file=file))
+
+
+@task
+def db_restore(file):
+    """
+    Restore a remote DB dump file to a remote instance's database.
+
+    This will rename the existing database to {previous_name}_bak
+    and create a completely new database with what's in the dump.
+
+    If there's already a backup database, the restore will fail.
+
+    Example:
+
+      `fab staging instance:iraq db_restore:/tmp/staging_iraq.dump`
+
+    :param file: The remote file to restore.
+    """
+    require('environment', provided_by=SERVER_ENVIRONMENTS)
+    require('instance', provided_by='instance')
+
+    renamed = False
+    restored = False
+
+    if not files.exists(file):
+        abort("Remote file {file} does not exist".format(file=file))
+
+    try:
+        if db_exists(env.db_name):
+            # Rename existing DB to backup
+            db_backup = '{dbname}_bak'.format(dbname=env.db_name)
+            if db_exists(db_backup):
+                if confirm("There's already a database named {db_backup}. Replace with new backup?"
+                        .format(db_backup=db_backup)):
+                    sudo('dropdb {db_backup}'.format(db_backup=db_backup),
+                         user='postgres')
+                else:
+                    abort("ERROR: There's already a database named {db_backup}. "
+                          "Restoring would clobber it."
+                          .format(db_backup=db_backup))
+            sudo('psql -c "ALTER DATABASE {dbname} RENAME TO {db_backup}"'
+                 .format(dbname=env.db_name, db_backup=db_backup),
+                 user='postgres')
+            renamed = True
+            print("Renamed {dbname} to {db_backup}".format(dbname=env.db_name, db_backup=db_backup))
+=======
+    @task
+    def db_backup():
+        """
+        Backup the database to S3 just like the nightly cron job
+        """
+        require('environment')
+        require('instance', provided_by='instance')
+        manage_run("dbbackup --encrypt")
+
+
+    def db_exists(dbname):
+        """
+        Return True if a db named DBNAME exists on the remote host.
+        """
+        require('environment', provided_by=SERVER_ENVIRONMENTS)
+        output = sudo('psql -l --pset=format=unaligned', user='postgres')
+        dbnames = [line.split('|')[0] for line in output.splitlines()]
+        return dbname in dbnames
+
+
+    @task
+    def db_dump(file):
+        """
+        Dump an instance's database to a remote file.
+
+        Example:
+
+          `fab staging instance:iraq db_dump:/tmp/staging_iraq.dump`
+>>>>>>> 7b05a5cc134c0e1dfa98197019b969b4c8f54aaa
+
+<<<<<<< HEAD
           `fab staging instance:iraq db_dump:/tmp/staging_iraq.dump`
 
         dumps to staging_iraq.dump
         """
         require('environment', provided_by=SERVER_ENVIRONMENTS)
         require('instance', provided_by='instance')
+||||||| merged common ancestors
+=======
+        dumps to staging_iraq.dump
+        """
+        require('environment', provided_by=SERVER_ENVIRONMENTS)
+        require('instance', provided_by='instance')
+>>>>>>> 7b05a5cc134c0e1dfa98197019b969b4c8f54aaa
         remote_file = file
 
         if files.exists(file):
